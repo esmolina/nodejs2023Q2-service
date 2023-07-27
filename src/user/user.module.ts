@@ -5,6 +5,12 @@ import { UsersStore } from './store/users.storage';
 
 @Module({
   controllers: [UserController],
-  providers: [UserService, UsersStore],
+  providers: [
+    UserService,
+    {
+      provide: 'UsersStorageInterface',
+      useClass: UsersStore,
+    },
+  ],
 })
 export class UserModule {}

@@ -40,6 +40,12 @@ export class UsersStore implements UsersStorageInterface {
     return getUserWithoutPassword(user);
   }
 
+  getUserByIdWitchPassword(id: string): UserInterface | undefined {
+    const user = this.users.find((user) => user.id === id);
+    if (!user) return undefined;
+    return user;
+  }
+
   updateUserPassword(
     id: string,
     updateUserPasswordDto: UpdatePasswordDto,

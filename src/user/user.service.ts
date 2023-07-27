@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
-import { UsersStore } from './store/users.storage';
+import { UsersStorageInterface } from './interfaces/user-storage.interface';
+import { UserInterface } from './interfaces/user-interface';
 
 @Injectable()
 export class UserService {
-  constructor(private storage: UsersStore) {}
+  constructor(
+    @Inject('UsersStorageInterface') private storage: UsersStorageInterface,
+  ) {}
 
   create(createUserDto: CreateUserDto): UserEntity {
     return this.storage.createNewUser(createUserDto);
@@ -18,6 +21,10 @@ export class UserService {
 
   findOne(id: string): UserEntity | undefined {
     return this.storage.getUserById(id);
+  }
+
+  findUserWitchAllAtributes(id: string): UserInterface | undefined {
+    return this.storage.getUserByIdWitchPassword(id);
   }
 
   update(
