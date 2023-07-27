@@ -19,6 +19,17 @@ import { validateIdByUuid } from './helpers/validateIdByUuid';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  checkIsLoginAvailable(createdUserLogin: string): void {
+    const isLoginAvailable =
+      this.userService.checkLoginIsAvailable(createdUserLogin);
+    if (!isLoginAvailable) {
+      throw new HttpException(
+        `A user with the login '${createdUserLogin}' already exists`,
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
+
   checkIsUserExist(id: string): void {
     const user = this.userService.findUserWitchAllAtributes(id);
     if (!user) {
@@ -55,17 +66,11 @@ export class UserController {
     }
   }
 
-  checkOldPasswordIsValid(id: string, oldPassword: string): void {
-    const user = this.userService.findUserWitchAllAtributes(id);
-    if (user.password !== oldPassword) {
-      throw new HttpException(`Old password is wrong`, HttpStatus.FORBIDDEN);
-    }
-  }
-
   @Post()
   //may use @HttpCode(201)
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createUserDto: CreateUserDto) {
+    this.checkIsLoginAvailable(createUserDto.login);
     return this.userService.create(createUserDto);
   }
 

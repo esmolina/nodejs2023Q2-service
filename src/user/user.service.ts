@@ -11,6 +11,10 @@ export class UserService {
     @Inject('UsersStorageInterface') private storage: UsersStorageInterface,
   ) {}
 
+  checkLoginIsAvailable(createdUserLogin: string): boolean {
+    return this.storage.checkTheUserNotExists(createdUserLogin);
+  }
+
   create(createUserDto: CreateUserDto): UserEntity {
     return this.storage.createNewUser(createUserDto);
   }

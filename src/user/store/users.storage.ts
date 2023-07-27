@@ -11,6 +11,11 @@ import { UserEntity } from '../entities/user.entity';
 export class UsersStore implements UsersStorageInterface {
   private users: Array<UserInterface> = [];
 
+  checkTheUserNotExists(login: string): boolean {
+    const userIndex = this.users.findIndex((user) => user.login === login);
+    return userIndex === -1;
+  }
+
   createNewUser(createUserDto: CreateUserDto): UserEntity {
     const newUser: UserInterface = {
       id: uuid(),

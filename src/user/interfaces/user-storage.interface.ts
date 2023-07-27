@@ -5,6 +5,7 @@ import { UserEntity } from '../entities/user.entity';
 import { UserInterface } from './user-interface';
 
 export interface UsersStorageInterface {
+  checkTheUserNotExists: (login: string) => boolean;
   createNewUser: (createUserDto: CreateUserDto) => UserEntity;
   getUsers: () => Array<GetUserDto>;
   getUserById: (id: string) => UserEntity | undefined;
