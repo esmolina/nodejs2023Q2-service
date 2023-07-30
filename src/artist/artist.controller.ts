@@ -57,11 +57,13 @@ export class ArtistController {
   }
 
   @Get()
+  @HttpCode(HttpStatus.OK)
   findAll() {
     return this.artistService.findAll();
   }
 
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
     this.checkIsIsIdValid(id);
     this.checkIsArtistExist(id);
@@ -69,6 +71,7 @@ export class ArtistController {
   }
 
   @Put(':id')
+  @HttpCode(HttpStatus.OK)
   update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
     this.checkIsIsIdValid(id);
     this.checkIsArtistExist(id);
@@ -77,6 +80,7 @@ export class ArtistController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
     this.checkIsIsIdValid(id);
     this.checkIsArtistExist(id);
