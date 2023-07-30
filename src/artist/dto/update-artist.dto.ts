@@ -1,3 +1,4 @@
-import { CreateArtistDto } from './create-artist.dto';
-
-export class UpdateArtistDto extends CreateArtistDto {}
+export class UpdateArtistDto {
+  name: string;
+  grammy: boolean;
+}
