@@ -53,4 +53,8 @@ export class ArtistService {
     });
     return favouritesArray;
   }
+
+  isArtistExist(id: string): boolean {
+    return !!this.findOne(id);
+  }
 }

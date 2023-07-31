@@ -51,4 +51,8 @@ export class AlbumService {
     });
     return favouritesArray;
   }
+
+  isAlbumExist(id: string): boolean {
+    return !!this.findOne(id);
+  }
 }

@@ -31,31 +31,44 @@ export class FavsController {
     }
   }
 
+  setErrorResourceNotExist(type: 'artist' | 'album' | 'track', id: string) {
+    throw new HttpException(
+      `The ${type} with ID #${id} doesn't exist`,
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    );
+  }
+
   @Get()
   @HttpCode(HttpStatus.OK)
   getAllFavorites() {
     return this.favsService.getFavs();
   }
 
-  @Post('track/:id')
+  @Post('artist/:id')
   @HttpCode(HttpStatus.CREATED)
-  addTrackToFavorites(@Param('id') trackId: string) {
-    this.checkIsIsIdValid(trackId);
-    this.favsService.addToFavorites('track', trackId);
+  addArtistToFavorites(@Param('id') artistId: string) {
+    this.checkIsIsIdValid(artistId);
+    if (!this.favsService.checkIsArtistExist(artistId)) {
+      this.setErrorResourceNotExist('artist', artistId);
+    }
+    this.favsService.addToFavorites('artist', artistId);
   }
 
-  @Delete('track/:id')
+  @Delete('artist/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeTrackFromFavorites(@Param('id') trackId: string) {
-    this.checkIsIsIdValid(trackId);
-    this.checkIsNotFavorite('track', trackId);
-    this.favsService.removeFromFavorites('track', trackId);
+  removeArtistFromFavorites(@Param('id') artistId: string) {
+    this.checkIsIsIdValid(artistId);
+    this.checkIsNotFavorite('artist', artistId);
+    this.favsService.removeFromFavorites('artist', artistId);
   }
 
   @Post('album/:id')
   @HttpCode(HttpStatus.CREATED)
   addAlbumToFavorites(@Param('id') albumId: string) {
     this.checkIsIsIdValid(albumId);
+    if (!this.favsService.checkIsAlbumExist(albumId)) {
+      this.setErrorResourceNotExist('album', albumId);
+    }
     this.favsService.addToFavorites('album', albumId);
   }
 
@@ -67,18 +80,21 @@ export class FavsController {
     this.favsService.removeFromFavorites('album', albumId);
   }
 
-  @Post('artist/:id')
+  @Post('track/:id')
   @HttpCode(HttpStatus.CREATED)
-  addArtistToFavorites(@Param('id') artistId: string) {
-    this.checkIsIsIdValid(artistId);
-    this.favsService.addToFavorites('artist', artistId);
+  addTrackToFavorites(@Param('id') trackId: string) {
+    this.checkIsIsIdValid(trackId);
+    if (!this.favsService.checkIsTrackExist(trackId)) {
+      this.setErrorResourceNotExist('track', trackId);
+    }
+    this.favsService.addToFavorites('track', trackId);
   }
 
-  @Delete('artist/:id')
+  @Delete('track/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeArtistFromFavorites(@Param('id') artistId: string) {
-    this.checkIsIsIdValid(artistId);
-    this.checkIsNotFavorite('artist', artistId);
-    this.favsService.removeFromFavorites('artist', artistId);
+  removeTrackFromFavorites(@Param('id') trackId: string) {
+    this.checkIsIsIdValid(trackId);
+    this.checkIsNotFavorite('track', trackId);
+    this.favsService.removeFromFavorites('track', trackId);
   }
 }

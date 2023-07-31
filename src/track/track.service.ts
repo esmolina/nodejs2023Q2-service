@@ -49,4 +49,8 @@ export class TrackService {
     });
     return favouritesArray;
   }
+
+  isTrackExist(id: string): boolean {
+    return !!this.findOne(id);
+  }
 }

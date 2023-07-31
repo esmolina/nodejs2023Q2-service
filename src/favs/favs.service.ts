@@ -22,6 +22,18 @@ export class FavsService {
     return this.favsStorage.checkIsNotFavorite(type, searchableId);
   }
 
+  checkIsArtistExist(id: string): boolean {
+    return this.artistService.isArtistExist(id);
+  }
+
+  checkIsAlbumExist(id: string): boolean {
+    return this.albumService.isAlbumExist(id);
+  }
+
+  checkIsTrackExist(id: string): boolean {
+    return this.trackService.isTrackExist(id);
+  }
+
   findIds(): FavsDataBaseInterface {
     return this.favsStorage.getAllFavoritesIds();
   }
