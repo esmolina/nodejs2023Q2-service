@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { FavEntity } from './entities/fav.entity';
 import { FavsDataBaseInterface } from './interfaces/favs-data-base.interface';
 import { ArtistService } from '../artist/artist.service';
@@ -10,8 +10,11 @@ import { FavsStorageInterface } from './interfaces/favs-storage.interface';
 export class FavsService {
   constructor(
     @Inject('FavsStorageInterface') private favsStorage: FavsStorageInterface,
+    @Inject(forwardRef(() => ArtistService))
     private readonly artistService: ArtistService,
+    @Inject(forwardRef(() => AlbumService))
     private readonly albumService: AlbumService,
+    @Inject(forwardRef(() => TrackService))
     private readonly trackService: TrackService,
   ) {}
 

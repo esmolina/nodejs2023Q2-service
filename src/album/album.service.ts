@@ -1,15 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { AlbumsStorageInterface } from './interfaces/albums-storage.interface';
 import { AlbumEntity } from './entities/album.entity';
 import { TrackService } from '../track/track.service';
+import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class AlbumService {
   constructor(
     @Inject('AlbumsStorageInterface') private storage: AlbumsStorageInterface,
+    @Inject(forwardRef(() => TrackService))
     private tracksService: TrackService,
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
   ) {}
 
   checkNewAlbumNameIsAvailable(createdAlbumName: string): boolean {
@@ -34,6 +38,7 @@ export class AlbumService {
 
   remove(id: string): string | undefined {
     this.tracksService.updateAlbumIdInTracks(id);
+    this.favsService.removeFromFavorites('album', id);
     return this.storage.removeAlbum(id);
   }
 

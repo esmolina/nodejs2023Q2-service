@@ -1,17 +1,22 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { ArtistsStorageInterface } from './interfaces/artist-storage.interface';
 import { ArtistEntity } from './entities/artist.entity';
 import { AlbumService } from '../album/album.service';
 import { TrackService } from '../track/track.service';
+import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class ArtistService {
   constructor(
     @Inject('ArtistsStorageInterface') private storage: ArtistsStorageInterface,
+    @Inject(forwardRef(() => AlbumService))
     private albumsService: AlbumService,
+    @Inject(forwardRef(() => TrackService))
     private tracksService: TrackService,
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
   ) {}
 
   checkNewArtistNAmeIsAvailable(createdArtistLogin: string): boolean {
@@ -40,6 +45,7 @@ export class ArtistService {
   remove(id: string): string | undefined {
     this.albumsService.updateArtistIdInAlbums(id);
     this.tracksService.updateArtistIdInTracks(id);
+    this.favsService.removeFromFavorites('artist', id);
     return this.storage.removeArtist(id);
   }
 
