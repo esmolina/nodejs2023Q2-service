@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export interface Artist {
   id: string;
   name: string;
@@ -20,7 +22,19 @@ export interface Track {
 }
 
 export class FavEntity {
+  @ApiProperty({
+    description: 'The array of artists',
+    type: 'array',
+  })
   artists: Array<Artist>;
+  @ApiProperty({
+    description: 'The array of albums',
+    type: 'array',
+  })
   albums: Array<Album>;
+  @ApiProperty({
+    description: 'The array of traks',
+    type: 'array',
+  })
   tracks: Array<Track>;
 }

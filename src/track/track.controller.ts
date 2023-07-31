@@ -10,12 +10,23 @@ import {
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiCreatedResponse,
+  ApiTags,
+  ApiNotFoundResponse,
+  ApiNoContentResponse,
+} from '@nestjs/swagger';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { validateIdByUuid } from '../helpers/validateIdByUuid';
+import { AlbumEntity } from '../album/entities/album.entity';
+import { TrackEntity } from './entities/track.entity';
 
 @Controller('track')
+@ApiTags('tracks')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
@@ -40,6 +51,13 @@ export class TrackController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiCreatedResponse({
+    description: 'The track-record has been created successfully.',
+    type: TrackEntity,
+  })
+  @ApiBadRequestResponse({
+    description: 'Request body does not contain required fields',
+  })
   create(@Body() createAlbumDto: CreateTrackDto) {
     if (createAlbumDto.artistId) {
       this.checkIsIsIdValid(createAlbumDto.artistId);
@@ -49,12 +67,22 @@ export class TrackController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Successfully get all tracks.',
+    type: [TrackEntity],
+  })
   findAll() {
     return this.trackService.findAll();
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Successfully get the track.',
+    type: AlbumEntity,
+  })
+  @ApiBadRequestResponse({ description: 'Track ID (UUID) is incorrect.' })
+  @ApiNotFoundResponse({ description: 'Track with the given ID not found.' })
   findOne(@Param('id') id: string) {
     this.checkIsIsIdValid(id);
     this.checkIsTrackExist(id);
@@ -63,6 +91,12 @@ export class TrackController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'The track has been updated successfully.',
+    type: AlbumEntity,
+  })
+  @ApiBadRequestResponse({ description: 'Track ID (UUID) is incorrect.' })
+  @ApiNotFoundResponse({ description: 'Track with the given ID not found.' })
   update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
     this.checkIsIsIdValid(id);
     this.checkIsTrackExist(id);
@@ -72,6 +106,11 @@ export class TrackController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'The track has been deleted successfully.',
+  })
+  @ApiBadRequestResponse({ description: 'Track ID (UUID) is incorrect.' })
+  @ApiNotFoundResponse({ description: 'Track with the given ID not found.' })
   remove(@Param('id') id: string) {
     this.checkIsIsIdValid(id);
     this.checkIsTrackExist(id);
