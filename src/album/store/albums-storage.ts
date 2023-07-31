@@ -55,4 +55,12 @@ export class AlbumsStore implements AlbumsStorageInterface {
     this.albums.splice(albumIndex, 1);
     return `The album with ID #${id} was successfully deleted`;
   }
+
+  updateArtistIdInAlbums(artistId: string): void {
+    this.albums.forEach((album) => {
+      if (album.artistId === artistId) {
+        album.artistId = null;
+      }
+    });
+  }
 }

@@ -3,11 +3,13 @@ import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { ArtistsStorageInterface } from './interfaces/artist-storage.interface';
 import { ArtistEntity } from './entities/artist.entity';
+import { AlbumService } from '../album/album.service';
 
 @Injectable()
 export class ArtistService {
   constructor(
     @Inject('ArtistsStorageInterface') private storage: ArtistsStorageInterface,
+    private albumsService: AlbumService,
   ) {}
 
   checkNewArtistNAmeIsAvailable(createdArtistLogin: string): boolean {
@@ -34,6 +36,7 @@ export class ArtistService {
   }
 
   remove(id: string): string | undefined {
+    this.albumsService.updateArtistIdInAlbums(id);
     return this.storage.removeArtist(id);
   }
 }

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { AlbumController } from './album.controller';
 import { AlbumsStore } from './store/albums-storage';
-import { ArtistModule } from '../artist/artist.module';
 
 @Module({
   controllers: [AlbumController],
@@ -13,6 +12,6 @@ import { ArtistModule } from '../artist/artist.module';
       useClass: AlbumsStore,
     },
   ],
-  imports: [ArtistModule],
+  exports: [AlbumService],
 })
 export class AlbumModule {}

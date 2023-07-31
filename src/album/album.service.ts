@@ -33,4 +33,8 @@ export class AlbumService {
   remove(id: string): string | undefined {
     return this.storage.removeAlbum(id);
   }
+
+  updateArtistIdInAlbums(artistId: string): void {
+    this.storage.updateArtistIdInAlbums(artistId);
+  }
 }

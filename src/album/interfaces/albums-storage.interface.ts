@@ -12,4 +12,5 @@ export interface AlbumsStorageInterface {
     updateAlbumDto: UpdateAlbumDto,
   ) => AlbumEntity | undefined;
   removeAlbum: (id: string) => string | undefined;
+  updateArtistIdInAlbums: (artistId: string) => void;
 }
