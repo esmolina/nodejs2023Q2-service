@@ -40,7 +40,7 @@ To run only one of all test suites
 npm run test -- <path to suite>
 ```
 ## OpenAPI spec
-After application running (npm start) run tests open the browser tab [OpenAPI spec link](http://localhost:4000/api)
+After application running (npm start) open the browser tab [OpenAPI spec link](http://localhost:4000/api)
 
 ### [Technical requirements](https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/rest-service/assignment.md)
 ### [Cross-check criteria](https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/rest-service/score.md)
