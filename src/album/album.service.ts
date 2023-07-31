@@ -40,4 +40,15 @@ export class AlbumService {
   updateArtistIdInAlbums(artistId: string): void {
     this.storage.updateArtistIdInAlbums(artistId);
   }
+
+  getFavorites(ids: Array<string>): Array<AlbumEntity> {
+    const favouritesArray: Array<AlbumEntity> = [];
+    ids.map((id) => {
+      const favAlbum = this.findOne(id);
+      if (favAlbum) {
+        favouritesArray.push(favAlbum);
+      }
+    });
+    return favouritesArray;
+  }
 }

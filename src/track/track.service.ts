@@ -38,4 +38,15 @@ export class TrackService {
   updateAlbumIdInTracks(artistId: string): void {
     this.tracksStorage.updateAlbumIdInTracks(artistId);
   }
+
+  getFavorites(ids: Array<string>): Array<TrackEntity> {
+    const favouritesArray: Array<TrackEntity> = [];
+    ids.map((id) => {
+      const favTrack = this.findOne(id);
+      if (favTrack) {
+        favouritesArray.push(favTrack);
+      }
+    });
+    return favouritesArray;
+  }
 }

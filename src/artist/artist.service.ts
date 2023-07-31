@@ -42,4 +42,15 @@ export class ArtistService {
     this.tracksService.updateArtistIdInTracks(id);
     return this.storage.removeArtist(id);
   }
+
+  getFavorites(ids: Array<string>): Array<ArtistEntity> {
+    const favouritesArray: Array<ArtistEntity> = [];
+    ids.map((id) => {
+      const favArtist = this.findOne(id);
+      if (favArtist) {
+        favouritesArray.push(favArtist);
+      }
+    });
+    return favouritesArray;
+  }
 }
