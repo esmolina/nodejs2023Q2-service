@@ -11,6 +11,16 @@ export class FavsStore implements FavsStorageInterface {
     tracks: [],
   };
 
+  checkIsNotFavorite(
+    type: 'artist' | 'album' | 'track',
+    searchableId: string,
+  ): boolean {
+    const resourceIndex = this.favoritesIds[`${type}s`].findIndex(
+      (id) => id === searchableId,
+    );
+    return resourceIndex === -1;
+  }
+
   getAllFavoritesIds(): FavsDataBaseInterface {
     return this.favoritesIds;
   }

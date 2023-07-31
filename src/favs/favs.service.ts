@@ -15,6 +15,13 @@ export class FavsService {
     private readonly trackService: TrackService,
   ) {}
 
+  checkIsIdNotFavorites(
+    type: 'artist' | 'album' | 'track',
+    searchableId: string,
+  ): boolean {
+    return this.favsStorage.checkIsNotFavorite(type, searchableId);
+  }
+
   findIds(): FavsDataBaseInterface {
     return this.favsStorage.getAllFavoritesIds();
   }
