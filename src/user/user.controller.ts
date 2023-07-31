@@ -94,7 +94,7 @@ export class UserController {
     @Param('id') id: string,
     @Body() updateUserPasswordDto: UpdatePasswordDto,
   ) {
-    // this.checkIsIdValid(id);
+    this.checkIsIdValid(id);
     this.checkIsUserExist(id);
     this.checkErrorsChangePassword(
       id,

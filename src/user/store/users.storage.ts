@@ -57,6 +57,11 @@ export class UsersStore implements UsersStorageInterface {
   ): UserEntity | undefined {
     const user = this.users.find((user) => user.id === id);
     if (!user) return undefined;
+    if (
+      !updateUserPasswordDto.newPassword ||
+      !updateUserPasswordDto.oldPassword
+    )
+      return getUserWithoutPassword(user);
     user.password = updateUserPasswordDto.newPassword;
     user.version = user.version + 1;
     user.updatedAt = Date.now();
