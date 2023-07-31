@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersStorageInterface } from '../interfaces/user-storage.interface';
 import { UserInterface } from '../interfaces/user-interface';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { getUserWithoutPassword } from '../helpers/getUserWithoutPassword';
+import { getUserWithoutPassword } from '../../helpers/getUserWithoutPassword';
 import { UpdatePasswordDto } from '../dto/update-user.dto';
 import { UserEntity } from '../entities/user.entity';
 

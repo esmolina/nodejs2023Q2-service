@@ -10,7 +10,7 @@ import {
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
-import { validateIdByUuid } from '../user/helpers/validateIdByUuid';
+import { validateIdByUuid } from '../helpers/validateIdByUuid';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';

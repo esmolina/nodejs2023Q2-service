@@ -13,7 +13,7 @@ import {
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { validateIdByUuid } from '../user/helpers/validateIdByUuid';
+import { validateIdByUuid } from '../helpers/validateIdByUuid';
 
 @Controller('artist')
 export class ArtistController {

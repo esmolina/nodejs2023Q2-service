@@ -3,11 +3,13 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { AlbumsStorageInterface } from './interfaces/albums-storage.interface';
 import { AlbumEntity } from './entities/album.entity';
+import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class AlbumService {
   constructor(
     @Inject('AlbumsStorageInterface') private storage: AlbumsStorageInterface,
+    private tracksService: TrackService,
   ) {}
 
   checkNewAlbumNameIsAvailable(createdAlbumName: string): boolean {
@@ -31,6 +33,7 @@ export class AlbumService {
   }
 
   remove(id: string): string | undefined {
+    this.tracksService.updateAlbumIdInTracks(id);
     return this.storage.removeAlbum(id);
   }
 

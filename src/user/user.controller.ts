@@ -13,7 +13,7 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
-import { validateIdByUuid } from './helpers/validateIdByUuid';
+import { validateIdByUuid } from '../helpers/validateIdByUuid';
 
 @Controller('user')
 export class UserController {
