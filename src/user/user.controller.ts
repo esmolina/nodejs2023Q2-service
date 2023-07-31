@@ -40,7 +40,7 @@ export class UserController {
     }
   }
 
-  checkIsIsIdValid(id: string): void {
+  checkIsIdValid(id: string): void {
     if (!validateIdByUuid(id)) {
       throw new HttpException(
         `Id #${id} is invalid (not uuid)`,
@@ -83,7 +83,7 @@ export class UserController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
-    this.checkIsIsIdValid(id);
+    this.checkIsIdValid(id);
     this.checkIsUserExist(id);
     return this.userService.findOne(id);
   }
@@ -94,7 +94,7 @@ export class UserController {
     @Param('id') id: string,
     @Body() updateUserPasswordDto: UpdatePasswordDto,
   ) {
-    this.checkIsIsIdValid(id);
+    // this.checkIsIdValid(id);
     this.checkIsUserExist(id);
     this.checkErrorsChangePassword(
       id,
@@ -108,7 +108,7 @@ export class UserController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
-    this.checkIsIsIdValid(id);
+    this.checkIsIdValid(id);
     this.checkIsUserExist(id);
     return this.userService.remove(id);
   }

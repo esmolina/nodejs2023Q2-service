@@ -23,9 +23,12 @@ export class ArtistController {
     const isRecordAvailable =
       this.artistService.checkNewArtistNAmeIsAvailable(createdArtistName);
     if (!isRecordAvailable) {
-      throw new HttpException(
+      // throw new HttpException(
+      //   `A artist with the name '${createdArtistName}' already exists`,
+      //   HttpStatus.CONFLICT,
+      // );
+      console.log(
         `A artist with the name '${createdArtistName}' already exists`,
-        HttpStatus.CONFLICT,
       );
     }
   }

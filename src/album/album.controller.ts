@@ -23,10 +23,11 @@ export class AlbumController {
     const isRecordAvailable =
       this.albumService.checkNewAlbumNameIsAvailable(createdAlbumName);
     if (!isRecordAvailable) {
-      throw new HttpException(
-        `A album with the name '${createdAlbumName}' already exists`,
-        HttpStatus.CONFLICT,
-      );
+      // throw new HttpException(
+      //   `A album with the name '${createdAlbumName}' already exists`,
+      //   HttpStatus.CONFLICT,
+      // );
+      console.log(`A album with the name '${createdAlbumName}' already exists`);
     }
   }
 
