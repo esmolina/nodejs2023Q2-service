@@ -1,0 +1,11 @@
+# compiled output
+/dist
+/node_modules
+/test
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDE
+/.idea

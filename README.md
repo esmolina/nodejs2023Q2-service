@@ -42,5 +42,11 @@ npm run test -- <path to suite>
 ## OpenAPI spec
 After application running (npm start) open the browser tab [OpenAPI spec link](http://localhost:4000/api)
 
+## Docker
+Building and launching containers
+```
+docker-compose up -d --build
+```
+
 ### [Technical requirements](https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/rest-service/assignment.md)
 ### [Cross-check criteria](https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/rest-service/score.md)

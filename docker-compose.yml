@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  docker-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app-image
+    container_name: app-container
+    restart: unless-stopped
+    volumes:
+      - ./src:/app
+    ports:
+      - '4000:4000'
+    depends_on:
+      - postgres-db
+    environment:
+      - POSTGRES_HOST='postgres-db'
+      - POSTGRES_PORT='3000'
+      - POSTGRES_USER='user'
+      - POSTGRES_PASSWORD='password'
+      - POSTGRES_DB='db-name'
+
+  postgres-db:
+    build:
+      context: ./postgres_db
+      dockerfile: Dockerfile
+    image: postgres-image
+    container_name: postgres-container
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  postgres_data:
