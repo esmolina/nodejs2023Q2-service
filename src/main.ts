@@ -5,7 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { config } from 'dotenv';
 
 const env = config();
-const PORT = Number(env.parsed.PORT) || 3000;
+const PORT = Number(env.parsed.PORT) || 4000;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

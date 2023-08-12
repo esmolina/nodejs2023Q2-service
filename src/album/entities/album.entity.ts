@@ -1,14 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
+@Entity('album')
 export class AlbumEntity {
   @ApiProperty({
     description: 'The ID of the album',
     type: 'string',
     format: 'uuid',
   })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ApiProperty({ description: 'The name of the album', type: 'string' })
+  @Column({ type: 'varchar', nullable: false })
   name: string;
 
   @ApiProperty({
@@ -16,6 +20,7 @@ export class AlbumEntity {
     type: 'number',
     format: 'int32',
   })
+  @Column({ type: 'integer', nullable: false })
   year: number;
 
   @ApiProperty({
@@ -24,5 +29,6 @@ export class AlbumEntity {
     format: 'uuid',
     nullable: true,
   })
+  @Column({ type: 'varchar', nullable: true })
   artistId: string | null;
 }
