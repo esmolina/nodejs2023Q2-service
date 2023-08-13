@@ -53,9 +53,9 @@ export class AlbumController {
     type: AlbumEntity,
   })
   @ApiBadRequestResponse({ description: 'Album ID (UUID) is incorrect.' })
-  create(@Body() createAlbumDto: CreateAlbumDto) {
+  async create(@Body() createAlbumDto: CreateAlbumDto) {
     if (createAlbumDto.artistId) {
-      this.checkIsIsIdValid(createAlbumDto.artistId);
+      await this.checkIsIsIdValid(createAlbumDto.artistId);
     }
     return this.albumService.create(createAlbumDto);
   }

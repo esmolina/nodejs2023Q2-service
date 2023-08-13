@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   HttpException,
 } from '@nestjs/common';
 import {
@@ -30,28 +31,27 @@ import { UserEntity } from './entities/user.entity';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  checkIsLoginAvailable(createdUserLogin: string): void {
-    const isLoginAvailable =
-      this.userService.checkLoginIsAvailable(createdUserLogin);
+  async checkIsLoginAvailable(createdUserLogin: string): Promise<void> {
+    const isLoginAvailable = await this.userService.checkLoginIsAvailable(
+      createdUserLogin,
+    );
     if (!isLoginAvailable) {
-      throw new HttpException(
-        `A user with the login '${createdUserLogin}' already exists`,
-        HttpStatus.CONFLICT,
-      );
+      // throw new HttpException(
+      //   `A user with the login '${createdUserLogin}' already exists`,
+      //   HttpStatus.CONFLICT,
+      // );
+      console.log(`A user with the login '${createdUserLogin}' already exists`);
     }
   }
 
-  checkIsUserExist(id: string): void {
-    const user = this.userService.findUserWitchAllAtributes(id);
+  async checkIsUserExist(id: string): Promise<void> {
+    const user = await this.userService.getUserWithPassword(id);
     if (!user) {
-      throw new HttpException(
-        `Record with id #${id}} doesn't exist`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Record with id #${id} doesn't exist`);
     }
   }
 
-  checkIsIdValid(id: string): void {
+  async checkIsIdValid(id: string): Promise<void> {
     if (!validateIdByUuid(id)) {
       throw new HttpException(
         `Id #${id} is invalid (not uuid)`,
@@ -60,12 +60,12 @@ export class UserController {
     }
   }
 
-  checkErrorsChangePassword(
+  async checkErrorsChangePassword(
     id: string,
     oldPassword: string,
     newPassword: string,
-  ): void {
-    const user = this.userService.findUserWitchAllAtributes(id);
+  ): Promise<void> {
+    const user = await this.userService.getUserWithPassword(id);
     if (user.password !== oldPassword) {
       throw new HttpException(`Old password is wrong`, HttpStatus.FORBIDDEN);
     }
@@ -87,8 +87,8 @@ export class UserController {
   @ApiBadRequestResponse({
     description: 'Request body does not contain required fields.',
   })
-  create(@Body() createUserDto: CreateUserDto) {
-    this.checkIsLoginAvailable(createUserDto.login);
+  async create(@Body() createUserDto: CreateUserDto) {
+    await this.checkIsLoginAvailable(createUserDto.login);
     return this.userService.create(createUserDto);
   }
 
@@ -110,9 +110,9 @@ export class UserController {
   })
   @ApiBadRequestResponse({ description: 'User ID (UUID) is incorrect.' })
   @ApiNotFoundResponse({ description: 'User with the given ID not found.' })
-  findOne(@Param('id') id: string) {
-    this.checkIsIdValid(id);
-    this.checkIsUserExist(id);
+  async findOne(@Param('id') id: string) {
+    await this.checkIsIdValid(id);
+    await this.checkIsUserExist(id);
     return this.userService.findOne(id);
   }
 
@@ -125,13 +125,13 @@ export class UserController {
   @ApiBadRequestResponse({ description: 'User ID (UUID) is incorrect.' })
   @ApiNotFoundResponse({ description: 'User with the given ID not found.' })
   @ApiForbiddenResponse({ description: 'Old password is wrong.' })
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateUserPasswordDto: UpdatePasswordDto,
   ) {
-    this.checkIsIdValid(id);
-    this.checkIsUserExist(id);
-    this.checkErrorsChangePassword(
+    await this.checkIsIdValid(id);
+    await this.checkIsUserExist(id);
+    await this.checkErrorsChangePassword(
       id,
       updateUserPasswordDto.oldPassword,
       updateUserPasswordDto.newPassword,
@@ -147,9 +147,9 @@ export class UserController {
   })
   @ApiBadRequestResponse({ description: 'User ID (UUID) is incorrect.' })
   @ApiNotFoundResponse({ description: 'User with the given ID not found.' })
-  remove(@Param('id') id: string) {
-    this.checkIsIdValid(id);
-    this.checkIsUserExist(id);
+  async remove(@Param('id') id: string) {
+    await this.checkIsIdValid(id);
+    await this.checkIsUserExist(id);
     return this.userService.remove(id);
   }
 }
