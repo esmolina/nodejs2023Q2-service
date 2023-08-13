@@ -44,8 +44,9 @@ export class UserEntity {
   @Column({ type: 'bigint', nullable: true })
   updatedAt: number;
 
-  toResponse() {
-    const { id, login, version, createdAt, updatedAt } = this;
-    return { id, login, version, createdAt, updatedAt };
-  }
+  // another way to return a user without a password
+  // toResponse() {
+  //   const { id, login, version, createdAt, updatedAt } = this;
+  //   return { id, login, version, createdAt, updatedAt };
+  // }
 }
