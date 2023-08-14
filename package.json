@@ -23,7 +23,11 @@
     "typeorm:create": "npm run typeorm migration:create -- -n",
     "typeorm:generate": "npm run typeorm migration:generate -- -n",
     "typeorm:run": "npm run typeorm migration:run",
-    "typeorm:revert": "npm run typeorm migration:revert"
+    "typeorm:revert": "npm run typeorm migration:revert",
+    "security:scan": "npm audit",
+    "docker:build": "docker build -t app-image .",
+    "docker:up": "docker-compose up",
+    "docker:up:detached": "docker-compose up -d"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",

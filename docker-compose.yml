@@ -1,38 +1,39 @@
-version: '3.8'
+version: '3'
 services:
-  docker-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: app-image
-    container_name: app-container
-    restart: unless-stopped
-    volumes:
-      - ./src:/app
-    ports:
-      - '4000:4000'
-    depends_on:
-      - postgres-db
-    environment:
-      - POSTGRES_HOST='postgres-db'
-      - POSTGRES_PORT='3000'
-      - POSTGRES_USER='user'
-      - POSTGRES_PASSWORD='password'
-      - POSTGRES_DB='db-name'
-
   postgres-db:
     build:
       context: ./postgres_db
       dockerfile: Dockerfile
     image: postgres-image
     container_name: postgres-container
-    restart: unless-stopped
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
 
-networks:
-  default:
-    driver: bridge
-
-volumes:
-  postgres_data:
+  docker-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app-image
+    container_name: app-container
+    restart: always
+    volumes:
+      - .:/app
+    ports:
+      - '4000:4000'
+    depends_on:
+      - postgres-db
+    environment:
+      - PORT=${PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
