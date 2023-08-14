@@ -1,10 +1,7 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { ArtistEntity } from './entities/artist.entity';
-import { AlbumService } from '../album/album.service';
-import { TrackService } from '../track/track.service';
-import { FavsService } from '../favs/favs.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -12,13 +9,7 @@ import { Repository } from 'typeorm';
 export class ArtistService {
   constructor(
     @InjectRepository(ArtistEntity)
-    private artistRepository: Repository<ArtistEntity>,
-    @Inject(forwardRef(() => AlbumService))
-    private albumsService: AlbumService,
-    @Inject(forwardRef(() => TrackService))
-    private tracksService: TrackService,
-    @Inject(forwardRef(() => FavsService))
-    private favsService: FavsService,
+    private artistRepository: Repository<ArtistEntity>, // @Inject(forwardRef(() => AlbumService))
   ) {}
 
   async create(createArtistDto: CreateArtistDto): Promise<ArtistEntity> {
@@ -54,25 +45,7 @@ export class ArtistService {
   async remove(id: string): Promise<string | undefined> {
     const result = await this.artistRepository.delete(id);
     if (result.affected === 0) return undefined;
-    await this.albumsService.updateArtistIdInAlbums(id);
-    await this.tracksService.updateArtistIdInTracks(id);
-    await this.favsService.removeFromFavorites('artist', id);
     return `The artist with ID #${id} was successfully deleted`;
-  }
-
-  async getFavorites(ids: Array<string>): Promise<ArtistEntity[]> {
-    const favouritesArray: Array<ArtistEntity> = [];
-    for (let i = 0; i < ids.length; i++) {
-      const favArtist = await this.findOne(ids[i]);
-      if (favArtist) {
-        favouritesArray.push(favArtist);
-      }
-    }
-    return favouritesArray;
-  }
-
-  async isArtistExist(id: string): Promise<boolean> {
-    return !!(await this.findOne(id));
   }
 
   async checkNewArtistNameIsExist(

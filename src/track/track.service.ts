@@ -1,9 +1,8 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackEntity } from './entities/track.entity';
-import { FavsService } from '../favs/favs.service';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -11,8 +10,6 @@ export class TrackService {
   constructor(
     @InjectRepository(TrackEntity)
     private trackRepository: Repository<TrackEntity>,
-    @Inject(forwardRef(() => FavsService))
-    private favsService: FavsService,
   ) {}
 
   async create(createTrackDto: CreateTrackDto): Promise<TrackEntity> {
@@ -60,42 +57,5 @@ export class TrackService {
     const result = await this.trackRepository.delete(id);
     if (result.affected === 0) return undefined;
     return `The track with ID #${id} was successfully deleted`;
-  }
-
-  async updateArtistIdInTracks(artistId: string): Promise<void> {
-    const tracks = await this.trackRepository.find(); // Получаем промис
-
-    tracks.forEach((track) => {
-      if (track.artistId === artistId) {
-        track.artistId = null;
-        this.trackRepository.save(track);
-      }
-    });
-  }
-
-  async updateAlbumIdInTracks(albumId: string): Promise<void> {
-    const tracks = await this.trackRepository.find(); // Получаем промис
-
-    tracks.forEach((track) => {
-      if (track.artistId === albumId) {
-        track.albumId = null;
-        this.trackRepository.save(track);
-      }
-    });
-  }
-
-  async getFavorites(ids: Array<string>): Promise<TrackEntity[]> {
-    const favouritesArray: Array<TrackEntity> = [];
-    for (let i = 0; i < ids.length; i++) {
-      const favTrack = await this.findOne(ids[i]);
-      if (favTrack) {
-        favouritesArray.push(favTrack);
-      }
-    }
-    return favouritesArray;
-  }
-
-  async isTrackExist(id: string): Promise<boolean> {
-    return !!(await this.findOne(id));
   }
 }

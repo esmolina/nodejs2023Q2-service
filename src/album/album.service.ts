@@ -1,10 +1,8 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { AlbumEntity } from './entities/album.entity';
-import { TrackService } from '../track/track.service';
-import { FavsService } from '../favs/favs.service';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -12,10 +10,6 @@ export class AlbumService {
   constructor(
     @InjectRepository(AlbumEntity)
     private albumRepository: Repository<AlbumEntity>,
-    @Inject(forwardRef(() => TrackService))
-    private tracksService: TrackService,
-    @Inject(forwardRef(() => FavsService))
-    private favsService: FavsService,
   ) {}
 
   async create(createAlbumDto: CreateAlbumDto): Promise<AlbumEntity> {
@@ -55,25 +49,5 @@ export class AlbumService {
     const result = await this.albumRepository.delete(id);
     if (result.affected === 0) return undefined;
     return `The album with ID #${id} was successfully deleted`;
-  }
-
-  async updateArtistIdInAlbums(artistId: string): Promise<void> {
-    await this.albumRepository
-      .createQueryBuilder()
-      .update(AlbumEntity)
-      .set({ artistId: null })
-      .where('artistId = :artistId', { artistId })
-      .execute();
-  }
-
-  async getFavorites(ids: Array<string>): Promise<AlbumEntity[]> {
-    const favouritesArray: Array<AlbumEntity> = [];
-    for (const id of ids) {
-      const favAlbum = await this.findOne(id);
-      if (favAlbum) {
-        favouritesArray.push(favAlbum);
-      }
-    }
-    return favouritesArray;
   }
 }
