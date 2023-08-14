@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   HttpException,
+  NotFoundException,
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
@@ -29,29 +30,14 @@ import { AlbumEntity } from './entities/album.entity';
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
-  checkIsNewAlbumNameAvailable(createdAlbumName: string): void {
-    const isRecordAvailable =
-      this.albumService.checkNewAlbumNameIsAvailable(createdAlbumName);
-    if (!isRecordAvailable) {
-      // throw new HttpException(
-      //   `A album with the name '${createdAlbumName}' already exists`,
-      //   HttpStatus.CONFLICT,
-      // );
-      console.log(`A album with the name '${createdAlbumName}' already exists`);
-    }
-  }
-
-  checkIsAlbumExist(id: string): void {
-    const album = this.albumService.findOne(id);
+  async checkIsAlbumExist(id: string): Promise<void> {
+    const album = await this.albumService.findOne(id);
     if (!album) {
-      throw new HttpException(
-        `Record with id #${id} doesn't exist`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Record with id #${id} doesn't exist`);
     }
   }
 
-  checkIsIsIdValid(id: string): void {
+  async checkIsIsIdValid(id: string): Promise<void> {
     if (!validateIdByUuid(id)) {
       throw new HttpException(
         `Id #${id} is invalid (not uuid)`,
@@ -67,12 +53,10 @@ export class AlbumController {
     type: AlbumEntity,
   })
   @ApiBadRequestResponse({ description: 'Album ID (UUID) is incorrect.' })
-  create(@Body() createAlbumDto: CreateAlbumDto) {
-    this.checkIsNewAlbumNameAvailable(createAlbumDto.name);
+  async create(@Body() createAlbumDto: CreateAlbumDto) {
     if (createAlbumDto.artistId) {
-      this.checkIsIsIdValid(createAlbumDto.artistId);
+      await this.checkIsIsIdValid(createAlbumDto.artistId);
     }
-    this.checkIsNewAlbumNameAvailable(createAlbumDto.name);
     return this.albumService.create(createAlbumDto);
   }
 
@@ -94,9 +78,9 @@ export class AlbumController {
   })
   @ApiBadRequestResponse({ description: 'Album ID (UUID) is incorrect.' })
   @ApiNotFoundResponse({ description: 'Album with the given ID not found.' })
-  findOne(@Param('id') id: string) {
-    this.checkIsIsIdValid(id);
-    this.checkIsAlbumExist(id);
+  async findOne(@Param('id') id: string) {
+    await this.checkIsIsIdValid(id);
+    await this.checkIsAlbumExist(id);
     return this.albumService.findOne(id);
   }
 
@@ -108,9 +92,12 @@ export class AlbumController {
   })
   @ApiBadRequestResponse({ description: 'Album ID (UUID) is incorrect.' })
   @ApiNotFoundResponse({ description: 'Album with the given ID not found.' })
-  update(@Param('id') id: string, @Body() updateAlbumDto: UpdateAlbumDto) {
-    this.checkIsIsIdValid(id);
-    this.checkIsAlbumExist(id);
+  async update(
+    @Param('id') id: string,
+    @Body() updateAlbumDto: UpdateAlbumDto,
+  ) {
+    await this.checkIsIsIdValid(id);
+    await this.checkIsAlbumExist(id);
 
     return this.albumService.update(id, updateAlbumDto);
   }
@@ -122,9 +109,9 @@ export class AlbumController {
   })
   @ApiBadRequestResponse({ description: 'Album ID (UUID) is incorrect.' })
   @ApiNotFoundResponse({ description: 'Album with the given ID not found.' })
-  remove(@Param('id') id: string) {
-    this.checkIsIsIdValid(id);
-    this.checkIsAlbumExist(id);
+  async remove(@Param('id') id: string) {
+    await this.checkIsIsIdValid(id);
+    await this.checkIsAlbumExist(id);
     return this.albumService.remove(id);
   }
 }

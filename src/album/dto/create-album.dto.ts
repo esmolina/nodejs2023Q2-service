@@ -12,7 +12,12 @@ export class CreateAlbumDto {
   @IsNumber()
   year: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'The ID of the artist (if applicable)',
+    type: 'string',
+    format: 'uuid',
+    nullable: true,
+  })
   @IsOptional()
   @IsString()
   artistId: string | null;

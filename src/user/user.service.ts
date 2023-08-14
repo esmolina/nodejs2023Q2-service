@@ -1,44 +1,73 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
-import { UsersStorageInterface } from './interfaces/user-storage.interface';
-import { UserInterface } from './interfaces/user-interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { getUserWithoutPassword } from '../helpers/getUserWithoutPassword';
 
 @Injectable()
 export class UserService {
   constructor(
-    @Inject('UsersStorageInterface') private storage: UsersStorageInterface,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
   ) {}
 
-  checkLoginIsAvailable(createdUserLogin: string): boolean {
-    return this.storage.checkTheUserNotExists(createdUserLogin);
+  async checkLoginIsAvailable(createdUserLogin: string): Promise<boolean> {
+    const userWitchSuchName = this.userRepository.findOne({
+      where: { login: createdUserLogin },
+    });
+    return !!userWitchSuchName;
   }
 
-  create(createUserDto: CreateUserDto): UserEntity {
-    return this.storage.createNewUser(createUserDto);
+  async create(createUserDto: CreateUserDto) {
+    const newUser = this.userRepository.create(createUserDto);
+    newUser.version = 1;
+    newUser.createdAt = Date.now();
+    newUser.updatedAt = Date.now();
+    const savedUser = await this.userRepository.save(newUser);
+    return getUserWithoutPassword(savedUser);
   }
 
-  findAll(): Array<UserEntity> {
-    return this.storage.getUsers();
+  async findAll() {
+    const users = await this.userRepository.find();
+    return users.map((user) => getUserWithoutPassword(user));
   }
 
-  findOne(id: string): UserEntity | undefined {
-    return this.storage.getUserById(id);
+  async findOne(id: string) {
+    const user = getUserWithoutPassword(
+      await this.userRepository.findOne({ where: { id: id } }),
+    );
+    return user;
   }
 
-  findUserWitchAllAtributes(id: string): UserInterface | undefined {
-    return this.storage.getUserByIdWitchPassword(id);
+  async update(id: string, updateUserPasswordDto: UpdatePasswordDto) {
+    const updatedUser = await this.userRepository.findOne({
+      where: { id: id },
+    });
+    if (!updatedUser) return undefined;
+    if (
+      !updateUserPasswordDto.newPassword ||
+      !updateUserPasswordDto.oldPassword
+    )
+      return getUserWithoutPassword(updatedUser);
+
+    updatedUser.password = updateUserPasswordDto.newPassword;
+    updatedUser.version = updatedUser.version + 1;
+    updatedUser.createdAt = Number(updatedUser.createdAt);
+    updatedUser.updatedAt = Date.now();
+
+    return getUserWithoutPassword(await this.userRepository.save(updatedUser));
   }
 
-  update(
-    id: string,
-    updateUserPasswordDto: UpdatePasswordDto,
-  ): UserEntity | undefined {
-    return this.storage.updateUserPassword(id, updateUserPasswordDto);
+  async remove(id: string) {
+    const result = await this.userRepository.delete(id);
+    if (result.affected === 0) return undefined;
+    return `The user with ID #${id} was successfully deleted`;
   }
 
-  remove(id: string): string | undefined {
-    return this.storage.removeUser(id);
+  async getUserWithPassword(id: string) {
+    const user = await this.userRepository.findOne({ where: { id: id } });
+    return user;
   }
 }

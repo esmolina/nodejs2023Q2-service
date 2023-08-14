@@ -19,14 +19,13 @@ import {
 } from '@nestjs/swagger';
 import { FavsService } from './favs.service';
 import { validateIdByUuid } from '../helpers/validateIdByUuid';
-import { FavEntity } from './entities/fav.entity';
 
 @Controller('favs')
 @ApiTags('favorites')
 export class FavsController {
   constructor(private readonly favsService: FavsService) {}
 
-  checkIsIsIdValid(id: string): void {
+  async checkIsIsIdValid(id: string): Promise<void> {
     if (!validateIdByUuid(id)) {
       throw new HttpException(
         `Id #${id} is invalid (not uuid)`,
@@ -35,28 +34,27 @@ export class FavsController {
     }
   }
 
-  checkIsNotFavorite(type: 'artist' | 'album' | 'track', id: string): void {
-    const isNotFavorite = this.favsService.checkIsIdNotFavorites(type, id);
-    if (isNotFavorite) {
-      throw new HttpException(`Is not favorite`, HttpStatus.BAD_REQUEST);
-    }
-  }
+  // checkIsNotFavorite(type: 'artist' | 'album' | 'track', id: string): void {
+  //   const isNotFavorite = this.favsService.checkIsIdNotFavorites(type, id);
+  //   if (isNotFavorite) {
+  //     throw new HttpException(`Is not favorite`, HttpStatus.BAD_REQUEST);
+  //   }
+  // }
 
-  setErrorResourceNotExist(type: 'artist' | 'album' | 'track', id: string) {
-    throw new HttpException(
-      `The ${type} with ID #${id} doesn't exist`,
-      HttpStatus.UNPROCESSABLE_ENTITY,
-    );
-  }
+  // setErrorResourceNotExist(type: 'artist' | 'album' | 'track', id: string) {
+  //   throw new HttpException(
+  //     `The ${type} with ID #${id} doesn't exist`,
+  //     HttpStatus.UNPROCESSABLE_ENTITY,
+  //   );
+  // }
 
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     description: 'Successfully get all favorites.',
-    type: [FavEntity],
   })
-  getAllFavorites() {
-    return this.favsService.getFavs();
+  async getAllFavorites() {
+    return await this.favsService.getFavs();
   }
 
   @Post('artist/:id')
@@ -68,12 +66,9 @@ export class FavsController {
   @ApiUnprocessableEntityResponse({
     description: "The artist with the given ID doesn't exist.",
   })
-  addArtistToFavorites(@Param('id') artistId: string) {
-    this.checkIsIsIdValid(artistId);
-    if (!this.favsService.checkIsArtistExist(artistId)) {
-      this.setErrorResourceNotExist('artist', artistId);
-    }
-    this.favsService.addToFavorites('artist', artistId);
+  async addArtistToFavorites(@Param('id') artistId: string) {
+    await this.checkIsIsIdValid(artistId);
+    await this.favsService.addToFavorites('artist', artistId);
   }
 
   @Delete('artist/:id')
@@ -85,10 +80,9 @@ export class FavsController {
   @ApiNotFoundResponse({
     description: 'The artist with the given ID is not favorite.',
   })
-  removeArtistFromFavorites(@Param('id') artistId: string) {
-    this.checkIsIsIdValid(artistId);
-    this.checkIsNotFavorite('artist', artistId);
-    this.favsService.removeFromFavorites('artist', artistId);
+  async removeArtistFromFavorites(@Param('id') artistId: string) {
+    await this.checkIsIsIdValid(artistId);
+    await this.favsService.removeFromFavorites('artist', artistId);
   }
 
   @Post('album/:id')
@@ -100,12 +94,9 @@ export class FavsController {
   @ApiUnprocessableEntityResponse({
     description: "The album with the given ID doesn't exist.",
   })
-  addAlbumToFavorites(@Param('id') albumId: string) {
-    this.checkIsIsIdValid(albumId);
-    if (!this.favsService.checkIsAlbumExist(albumId)) {
-      this.setErrorResourceNotExist('album', albumId);
-    }
-    this.favsService.addToFavorites('album', albumId);
+  async addAlbumToFavorites(@Param('id') albumId: string) {
+    await this.checkIsIsIdValid(albumId);
+    await this.favsService.addToFavorites('album', albumId);
   }
 
   @Delete('album/:id')
@@ -117,10 +108,9 @@ export class FavsController {
   @ApiNotFoundResponse({
     description: 'The album with the given ID is not favorite.',
   })
-  removeAlbumFromFavorites(@Param('id') albumId: string) {
-    this.checkIsIsIdValid(albumId);
-    this.checkIsNotFavorite('album', albumId);
-    this.favsService.removeFromFavorites('album', albumId);
+  async removeAlbumFromFavorites(@Param('id') albumId: string) {
+    await this.checkIsIsIdValid(albumId);
+    await this.favsService.removeFromFavorites('album', albumId);
   }
 
   @Post('track/:id')
@@ -132,12 +122,9 @@ export class FavsController {
   @ApiUnprocessableEntityResponse({
     description: "The track with the given ID doesn't exist.",
   })
-  addTrackToFavorites(@Param('id') trackId: string) {
-    this.checkIsIsIdValid(trackId);
-    if (!this.favsService.checkIsTrackExist(trackId)) {
-      this.setErrorResourceNotExist('track', trackId);
-    }
-    this.favsService.addToFavorites('track', trackId);
+  async addTrackToFavorites(@Param('id') trackId: string) {
+    await this.checkIsIsIdValid(trackId);
+    await this.favsService.addToFavorites('track', trackId);
   }
 
   @Delete('track/:id')
@@ -149,9 +136,8 @@ export class FavsController {
   @ApiNotFoundResponse({
     description: 'The track with the given ID is not favorite.',
   })
-  removeTrackFromFavorites(@Param('id') trackId: string) {
-    this.checkIsIsIdValid(trackId);
-    this.checkIsNotFavorite('track', trackId);
-    this.favsService.removeFromFavorites('track', trackId);
+  async removeTrackFromFavorites(@Param('id') trackId: string) {
+    await this.checkIsIsIdValid(trackId);
+    await this.favsService.removeFromFavorites('track', trackId);
   }
 }
