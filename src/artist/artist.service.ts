@@ -1,16 +1,18 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { ArtistsStorageInterface } from './interfaces/artist-storage.interface';
 import { ArtistEntity } from './entities/artist.entity';
 import { AlbumService } from '../album/album.service';
 import { TrackService } from '../track/track.service';
 import { FavsService } from '../favs/favs.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ArtistService {
   constructor(
-    @Inject('ArtistsStorageInterface') private storage: ArtistsStorageInterface,
+    @InjectRepository(ArtistEntity)
+    private artistRepository: Repository<ArtistEntity>,
     @Inject(forwardRef(() => AlbumService))
     private albumsService: AlbumService,
     @Inject(forwardRef(() => TrackService))
@@ -19,48 +21,65 @@ export class ArtistService {
     private favsService: FavsService,
   ) {}
 
-  checkNewArtistNAmeIsAvailable(createdArtistLogin: string): boolean {
-    return this.storage.checkTheArtistNotExists(createdArtistLogin);
+  async create(createArtistDto: CreateArtistDto): Promise<ArtistEntity> {
+    const newArtist = this.artistRepository.create(createArtistDto);
+    return await this.artistRepository.save(newArtist);
   }
 
-  create(createArtistDto: CreateArtistDto): ArtistEntity {
-    return this.storage.createNewArtist(createArtistDto);
+  async findAll(): Promise<ArtistEntity[]> {
+    const artists = this.artistRepository.find();
+    return artists;
   }
 
-  findAll(): Array<ArtistEntity> {
-    return this.storage.getArtists();
+  async findOne(id: string): Promise<ArtistEntity | undefined> {
+    const artist = await this.artistRepository.findOne({ where: { id: id } });
+    return artist;
   }
 
-  findOne(id: string): ArtistEntity | undefined {
-    return this.storage.getArtistById(id);
-  }
-
-  update(
+  async update(
     id: string,
     updateArtistDto: UpdateArtistDto,
-  ): ArtistEntity | undefined {
-    return this.storage.updateArtistInfo(id, updateArtistDto);
+  ): Promise<ArtistEntity | undefined> {
+    const updatedArtist = await this.artistRepository.findOne({
+      where: { id: id },
+    });
+    if (!updatedArtist) return undefined;
+
+    updatedArtist.name = updateArtistDto.name ?? updatedArtist.name;
+    updatedArtist.grammy = updateArtistDto.grammy ?? updatedArtist.grammy;
+
+    return this.artistRepository.save(updatedArtist);
   }
 
-  remove(id: string): string | undefined {
-    this.albumsService.updateArtistIdInAlbums(id);
-    this.tracksService.updateArtistIdInTracks(id);
-    this.favsService.removeFromFavorites('artist', id);
-    return this.storage.removeArtist(id);
+  async remove(id: string): Promise<string | undefined> {
+    const result = await this.artistRepository.delete(id);
+    if (result.affected === 0) return undefined;
+    await this.albumsService.updateArtistIdInAlbums(id);
+    await this.tracksService.updateArtistIdInTracks(id);
+    await this.favsService.removeFromFavorites('artist', id);
+    return `The artist with ID #${id} was successfully deleted`;
   }
 
-  getFavorites(ids: Array<string>): Array<ArtistEntity> {
+  async getFavorites(ids: Array<string>): Promise<ArtistEntity[]> {
     const favouritesArray: Array<ArtistEntity> = [];
-    ids.map((id) => {
-      const favArtist = this.findOne(id);
+    for (let i = 0; i < ids.length; i++) {
+      const favArtist = await this.findOne(ids[i]);
       if (favArtist) {
         favouritesArray.push(favArtist);
       }
-    });
+    }
     return favouritesArray;
   }
 
-  isArtistExist(id: string): boolean {
-    return !!this.findOne(id);
+  async isArtistExist(id: string): Promise<boolean> {
+    return !!(await this.findOne(id));
+  }
+
+  async checkNewArtistNameIsExist(
+    createdArtistLogin: string,
+  ): Promise<boolean> {
+    return !!(await this.artistRepository.findOne({
+      where: { name: createdArtistLogin },
+    }));
   }
 }

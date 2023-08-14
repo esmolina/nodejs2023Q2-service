@@ -9,6 +9,7 @@ import {
   HttpException,
   HttpStatus,
   HttpCode,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -29,10 +30,13 @@ import { ArtistEntity } from './entities/artist.entity';
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
-  checkIsNewArtistNameAvailable(createdArtistName: string): void {
-    const isRecordAvailable =
-      this.artistService.checkNewArtistNAmeIsAvailable(createdArtistName);
-    if (!isRecordAvailable) {
+  async checkIsNewArtistNameAvailable(
+    createdArtistName: string,
+  ): Promise<void> {
+    const isRecordExist = await this.artistService.checkNewArtistNameIsExist(
+      createdArtistName,
+    );
+    if (isRecordExist) {
       // throw new HttpException(
       //   `A artist with the name '${createdArtistName}' already exists`,
       //   HttpStatus.CONFLICT,
@@ -43,17 +47,14 @@ export class ArtistController {
     }
   }
 
-  checkIsArtistExist(id: string): void {
-    const artist = this.artistService.findOne(id);
+  async checkIsArtistExist(id: string): Promise<void> {
+    const artist = await this.artistService.findOne(id);
     if (!artist) {
-      throw new HttpException(
-        `Record with id #${id} doesn't exist`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Record with id #${id} doesn't exist`);
     }
   }
 
-  checkIsIsIdValid(id: string): void {
+  async checkIsIsIdValid(id: string): Promise<void> {
     if (!validateIdByUuid(id)) {
       throw new HttpException(
         `Id #${id} is invalid (not uuid)`,
@@ -71,9 +72,9 @@ export class ArtistController {
   @ApiBadRequestResponse({
     description: 'Request body does not contain required fields',
   })
-  create(@Body() createArtistDto: CreateArtistDto) {
-    this.checkIsNewArtistNameAvailable(createArtistDto.name);
-    return this.artistService.create(createArtistDto);
+  async create(@Body() createArtistDto: CreateArtistDto) {
+    await this.checkIsNewArtistNameAvailable(createArtistDto.name);
+    return await this.artistService.create(createArtistDto);
   }
 
   @Get()
@@ -96,9 +97,9 @@ export class ArtistController {
   @ApiBadRequestResponse({
     description: 'Invalid artist ID (UUID).',
   })
-  findOne(@Param('id') id: string) {
-    this.checkIsIsIdValid(id);
-    this.checkIsArtistExist(id);
+  async findOne(@Param('id') id: string) {
+    await this.checkIsIsIdValid(id);
+    await this.checkIsArtistExist(id);
     return this.artistService.findOne(id);
   }
 
@@ -112,9 +113,12 @@ export class ArtistController {
   @ApiBadRequestResponse({
     description: 'Invalid artist ID (UUID).',
   })
-  update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
-    this.checkIsIsIdValid(id);
-    this.checkIsArtistExist(id);
+  async update(
+    @Param('id') id: string,
+    @Body() updateArtistDto: UpdateArtistDto,
+  ) {
+    await this.checkIsIsIdValid(id);
+    await this.checkIsArtistExist(id);
 
     return this.artistService.update(id, updateArtistDto);
   }
@@ -128,9 +132,9 @@ export class ArtistController {
   @ApiBadRequestResponse({
     description: 'Invalid artist ID (UUID).',
   })
-  remove(@Param('id') id: string) {
-    this.checkIsIsIdValid(id);
-    this.checkIsArtistExist(id);
+  async remove(@Param('id') id: string) {
+    await this.checkIsIsIdValid(id);
+    await this.checkIsArtistExist(id);
     return this.artistService.remove(id);
   }
 }

@@ -26,7 +26,8 @@ export class FavsService {
   }
 
   checkIsArtistExist(id: string): boolean {
-    return this.artistService.isArtistExist(id);
+    // return this.artistService.isArtistExist(id);
+    return true;
   }
 
   checkIsAlbumExist(id: string): boolean {
@@ -49,7 +50,7 @@ export class FavsService {
       tracks: [],
     };
     const ids = this.findIds();
-    result.artists = this.artistService.getFavorites(ids.artists);
+    // result.artists = this.artistService.getFavorites(ids.artists);
     // result.albums = this.albumService.getFavorites(ids.albums);
     result.tracks = this.trackService.getFavorites(ids.tracks);
     return result;
