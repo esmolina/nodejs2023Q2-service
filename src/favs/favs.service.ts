@@ -36,7 +36,8 @@ export class FavsService {
   }
 
   checkIsTrackExist(id: string): boolean {
-    return this.trackService.isTrackExist(id);
+    // return this.trackService.isTrackExist(id);
+    return true;
   }
 
   findIds(): FavsDataBaseInterface {
@@ -52,7 +53,7 @@ export class FavsService {
     const ids = this.findIds();
     // result.artists = this.artistService.getFavorites(ids.artists);
     // result.albums = this.albumService.getFavorites(ids.albums);
-    result.tracks = this.trackService.getFavorites(ids.tracks);
+    // result.tracks = this.trackService.getFavorites(ids.tracks);
     return result;
   }
 
