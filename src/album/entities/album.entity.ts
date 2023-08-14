@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { ArtistEntity } from '../../artist/entities/artist.entity';
 
 @Entity('album')
 export class AlbumEntity {
@@ -29,6 +36,10 @@ export class AlbumEntity {
     format: 'uuid',
     nullable: true,
   })
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ name: 'artistId', type: 'varchar', nullable: true })
   artistId: string | null;
+
+  @ManyToOne(() => ArtistEntity, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'artistId', referencedColumnName: 'id' })
+  artist: ArtistEntity;
 }

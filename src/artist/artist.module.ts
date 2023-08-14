@@ -9,13 +9,13 @@ import { ArtistEntity } from './entities/artist.entity';
 
 @Module({
   controllers: [ArtistController],
-  providers: [ArtistService],
+  providers: [ArtistService, ArtistEntity],
   imports: [
     TypeOrmModule.forFeature([ArtistEntity]),
     forwardRef(() => AlbumModule),
     forwardRef(() => TrackModule),
     forwardRef(() => FavsModule),
   ],
-  exports: [ArtistService],
+  exports: [ArtistService, ArtistEntity],
 })
 export class ArtistModule {}
