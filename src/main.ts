@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { config } from 'dotenv';
+import { Request, Response } from 'express';
 import { CustomLoggerService } from './logger/logger.service';
 
 const env = config();
@@ -24,6 +25,18 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.useLogger(customLoggerService);
+  app.use((request: Request, response: Response, next) => {
+    const { query, body } = request;
+    customLoggerService.getRequestData(request, query, body);
+    customLoggerService.getResponseCode(response);
+
+    response.on('finish', () => {
+      customLoggerService.log('', request, response, query, body);
+    });
+
+    next();
+  });
+
   await app.listen(PORT);
 }
 
