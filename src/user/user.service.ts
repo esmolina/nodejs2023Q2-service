@@ -4,7 +4,13 @@ import { UpdatePasswordDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { getUserWithoutPassword } from '../helpers/getUserWithoutPassword';
+
+import { config } from 'dotenv';
+
+const env = config();
+const SALT_CRYPT = Number(env.parsed.CRYPT_SALT) || 10;
 
 @Injectable()
 export class UserService {
@@ -13,11 +19,41 @@ export class UserService {
     private userRepository: Repository<UserEntity>,
   ) {}
 
+  async validateUserPassword(authDto: CreateUserDto) {
+    const user = await this.getUserWithLogin(authDto.login);
+    if (!user) return undefined;
+    const enteredPasswordHash = await this.getHash(authDto.password);
+    return enteredPasswordHash === user.password;
+  }
+
+  private async getHash(secretInfo: string) {
+    const userSalt = await bcrypt.genSalt(SALT_CRYPT);
+    return await bcrypt.hash(secretInfo, userSalt);
+  }
+
+  async getUserWithLogin(userName: string) {
+    return await this.userRepository.findOne({
+      where: { login: userName },
+    });
+  }
+
   async checkLoginIsAvailable(createdUserLogin: string): Promise<boolean> {
     const userWitchSuchName = this.userRepository.findOne({
       where: { login: createdUserLogin },
     });
     return !!userWitchSuchName;
+  }
+
+  async signUp(newUserDto: CreateUserDto) {
+    const { password } = newUserDto;
+
+    const newUser = this.userRepository.create(newUserDto);
+    newUser.version = 1;
+    newUser.createdAt = Date.now();
+    newUser.updatedAt = Date.now();
+    newUser.password = await this.getHash(password);
+    const savedUser = await this.userRepository.save(newUser);
+    return getUserWithoutPassword(savedUser);
   }
 
   async create(createUserDto: CreateUserDto) {
