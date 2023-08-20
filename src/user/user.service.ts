@@ -6,7 +6,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { getUserWithoutPassword } from '../helpers/getUserWithoutPassword';
-
 import { config } from 'dotenv';
 
 const env = config();
@@ -21,17 +20,23 @@ export class UserService {
 
   async validateUserPassword(authDto: CreateUserDto) {
     const user = await this.getUserWithLogin(authDto.login);
-    if (!user) return undefined;
-    const enteredPasswordHash = await this.getHash(authDto.password);
-    return enteredPasswordHash === user.password;
+    if (!user) {
+      return undefined;
+    }
+    const isPasswordValid = await bcrypt.compare(
+      authDto.password,
+      user.password,
+    );
+    console.log(await this.getHash(authDto.password));
+    console.log(user.password);
+    return isPasswordValid;
   }
 
   private async getHash(secretInfo: string) {
-    const userSalt = await bcrypt.genSalt(SALT_CRYPT);
-    return await bcrypt.hash(secretInfo, userSalt);
+    return await bcrypt.hash(secretInfo, SALT_CRYPT);
   }
 
-  async getUserWithLogin(userName: string) {
+  public async getUserWithLogin(userName: string) {
     return await this.userRepository.findOne({
       where: { login: userName },
     });
