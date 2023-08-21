@@ -10,7 +10,8 @@ import { JwtPayload } from 'jsonwebtoken';
 import { config } from 'dotenv';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { GetTokenDto } from './dto/get-token.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { AuthEntity } from './entities/auth.entity';
 
 const env = config();
 const JWT_SECRET_ACCESS_KEY = env.parsed.JWT_SECRET_KEY;
@@ -42,7 +43,7 @@ export class AuthService {
       throw new HttpException(`Password is wrong`, HttpStatus.FORBIDDEN);
     }
 
-    const authTokens: GetTokenDto = {
+    const authTokens: AuthEntity = {
       accessToken: await this.getAccessToken(loggedUser.id, loggedUser.login),
       refreshToken: await this.getRefreshToken(loggedUser.id, loggedUser.login),
     };
