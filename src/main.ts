@@ -26,8 +26,6 @@ async function bootstrap() {
     const customLoggerService = new CustomLoggerService();
     app.useLogger(customLoggerService);
 
-    const { query, body } = request;
-
     response.on('finish', () => {
       customLoggerService.log(
         '',
