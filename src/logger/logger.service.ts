@@ -67,27 +67,35 @@ export class CustomLoggerService implements LoggerService {
     }
   }
 
-  public async error(message: string, data?: any) {
+  public async error(message: string, ...data: any) {
     if (LOG_LEVEL >= LogLevel.ERROR) {
-      console.error(`[LOG-error]`);
+      const resultMessage = `[LOG-error: ${message} ${data}\n`;
+      await this.printInStdout(resultMessage);
+      await this.appendToFile(this.errorFilePath, resultMessage);
     }
   }
 
-  public async warn(message: string, data?: any) {
+  public async warn(message: string, ...data: any) {
     if (LOG_LEVEL >= LogLevel.WARN) {
-      console.warn(`[LOG-warn]`);
+      const resultMessage = `[LOG-warn]: ${message} ${data}\n`;
+      await this.printInStdout(resultMessage);
+      await this.appendToFile(this.logFilePath, resultMessage);
     }
   }
 
-  public async debug(message: string, data?: any) {
+  public async debug(message: string, ...data: any) {
     if (LOG_LEVEL >= LogLevel.DEBUG) {
-      console.debug(`[LOG-debug]`);
+      const resultMessage = `[LOG-debug]: ${message} ${data}\n`;
+      await this.printInStdout(resultMessage);
+      await this.appendToFile(this.logFilePath, resultMessage);
     }
   }
 
-  public async verbose(message: string, data?: any) {
+  public async verbose(message: string, ...data: any) {
     if (LOG_LEVEL >= LogLevel.VERBOSE) {
-      console.log(`[LOG-verbose]`);
+      const resultMessage = `[LOG-verbose]: ${message} ${data}\n`;
+      await this.printInStdout(resultMessage);
+      await this.appendToFile(this.logFilePath, resultMessage);
     }
   }
 
