@@ -10,8 +10,8 @@ import { JwtPayload } from 'jsonwebtoken';
 import { config } from 'dotenv';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { AuthEntity } from './entities/auth.entity';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 const env = config();
 const JWT_SECRET_ACCESS_KEY = env.parsed.JWT_SECRET_KEY;
@@ -51,8 +51,31 @@ export class AuthService {
     return authTokens;
   }
 
-  async refresh() {
-    return `This action refresh`;
+  async refresh(newRefreshTokenDTO: RefreshTokenDto) {
+    const payload = await this.jwtService.verify(
+      newRefreshTokenDTO.refreshToken,
+      {
+        secret: JWT_SECRET_REFRESH_KEY,
+      },
+    );
+    if (!payload) {
+      throw new HttpException(`Refresh token invalid`, HttpStatus.FORBIDDEN);
+    }
+    const { userId, login } = payload;
+    const refreshedUser = await this.userService.findOne(userId);
+    if (!refreshedUser || refreshedUser.login !== login) {
+      throw new HttpException(
+        `Not found user to refresh`,
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const newAuthTokens: AuthEntity = {
+      accessToken: await this.getAccessToken(payload.userId, payload.login),
+      refreshToken: await this.getRefreshToken(payload.userId, payload.login),
+    };
+
+    return newAuthTokens;
   }
 
   private async getAccessToken(userId: string, login: string) {
