@@ -1,29 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { LoggerService } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { config } from 'dotenv';
 import { LogLevel } from '../types/enams';
+
+const env = config();
+const LOG_LEVEL: number = Number(env.parsed.LOG_LEVEL) || 1;
 
 @Injectable()
 export class CustomLoggerService implements LoggerService {
-  requestDataMessage: string;
-  responseCodeMessage: string;
-
-  constructor(private readonly logLevel: number) {
-    this.logLevel = logLevel;
-    this.requestDataMessage = '';
-    this.responseCodeMessage = '';
-  }
-
-  public getRequestData(request: Request, query: any, body: any) {
+  public getRequestDataMessage(request: Request, query: any, body: any) {
     const { method, url } = request;
-    this.requestDataMessage = `Method: ${method} URL: ${url}: Query params: ${JSON.stringify(
+    const requestDataMessage = `Method: ${method} URL: ${url}: Query params: ${JSON.stringify(
       query,
     )}, Body: ${JSON.stringify(body)}`;
+    return requestDataMessage;
   }
 
-  public getResponseCode(response: Response) {
+  public getResponseCodeMessage(response: Response) {
     const { statusCode } = response;
-    this.responseCodeMessage = `Status code: ${statusCode}`;
+    const responseCodeMessage = `Status code: ${statusCode}`;
+    return responseCodeMessage;
   }
 
   public async log(
@@ -33,33 +30,37 @@ export class CustomLoggerService implements LoggerService {
     query?: any,
     body?: any,
   ) {
-    if (this.logLevel >= LogLevel.LOG) {
-      const requestData = request ? `${this.requestDataMessage}` : '';
-      const responseCode = response ? `${this.responseCodeMessage}` : '';
+    if (LOG_LEVEL >= LogLevel.LOG) {
+      const requestData = request
+        ? this.getRequestDataMessage(request, query, body)
+        : '';
+      const responseCode = response
+        ? this.getResponseCodeMessage(response)
+        : '';
       console.log(`[LOG-Log] ${message} ${requestData} ${responseCode}`);
     }
   }
 
   public async error(message: string, data?: any) {
-    if (this.logLevel >= LogLevel.ERROR) {
+    if (LOG_LEVEL >= LogLevel.ERROR) {
       console.error(`[LOG-error]`);
     }
   }
 
   public async warn(message: string, data?: any) {
-    if (this.logLevel >= LogLevel.WARN) {
+    if (LOG_LEVEL >= LogLevel.WARN) {
       console.warn(`[LOG-warn]`);
     }
   }
 
   public async debug(message: string, data?: any) {
-    if (this.logLevel >= LogLevel.DEBUG) {
+    if (LOG_LEVEL >= LogLevel.DEBUG) {
       console.debug(`[LOG-debug]`);
     }
   }
 
   public async verbose(message: string, data?: any) {
-    if (this.logLevel >= LogLevel.VERBOSE) {
+    if (LOG_LEVEL >= LogLevel.VERBOSE) {
       console.log(`[LOG-verbose]`);
     }
   }

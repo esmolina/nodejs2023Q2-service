@@ -8,12 +8,10 @@ import { CustomLoggerService } from './logger/logger.service';
 
 const env = config();
 const PORT = Number(env.parsed.PORT) || 4000;
-const LOG_LEVEL: number = Number(env.parsed.LOG_LEVEL) || 1;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
-  const customLoggerService = new CustomLoggerService(LOG_LEVEL);
 
   const config = new DocumentBuilder()
     .setTitle('Home Library Service')
@@ -24,14 +22,20 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  app.useLogger(customLoggerService);
   app.use((request: Request, response: Response, next) => {
+    const customLoggerService = new CustomLoggerService();
+    app.useLogger(customLoggerService);
+
     const { query, body } = request;
-    customLoggerService.getRequestData(request, query, body);
-    customLoggerService.getResponseCode(response);
 
     response.on('finish', () => {
-      customLoggerService.log('', request, response, query, body);
+      customLoggerService.log(
+        '',
+        request,
+        response,
+        request.query,
+        request.body,
+      );
     });
 
     next();
