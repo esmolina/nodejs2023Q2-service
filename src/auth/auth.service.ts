@@ -50,9 +50,7 @@ export class AuthService {
     return authTokens;
   }
 
-  async;
-
-  refresh() {
+  async refresh() {
     return `This action refresh`;
   }
 
