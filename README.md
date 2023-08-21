@@ -1,52 +1,37 @@
 # Home Library Service
 
-
 ## Downloading
+
 ```
 git clone {repository URL}
 ```
 
 ## Checkout develop branch
-```
-git checkout develop
-```
-## Installing NPM modules
 
 ```
-npm install
+git checkout home_library_service-part3
 ```
 
-## Running application
+## Activate Postgress DB
 
+## Start server
+Docker not used - is not required in this task
 ```
-npm start
+npm run start:dev
 ```
-## Postman
-
-After starting the app on port (4000 as default) you can open
-Postman to check the server operation
 
 ## Testing
 
-After application running (npm start) run tests:
+Run tests:
 
 ```
-npm run test
+npm run test:auth
 ```
 
-To run only one of all test suites
+## Logging
 
-```
-npm run test -- <path to suite>
-```
-## OpenAPI spec
-After application running (npm start) open the browser tab [OpenAPI spec link](http://localhost:4000/api)
+After tests running you can see logs in ./journal with resoults
 
-## Docker
-Building and launching containers
-```
-docker-compose up -d --build
-```
+### [Technical requirements](https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/logging-error-authentication-authorization/assignment.md)
 
-### [Technical requirements](https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/rest-service/assignment.md)
-### [Cross-check criteria](https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/rest-service/score.md)
+### [Cross-check criteria](https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/logging-error-authentication-authorization/score.md)
